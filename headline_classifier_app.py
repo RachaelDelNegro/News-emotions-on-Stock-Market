@@ -12,17 +12,6 @@ def load_pipelines():
 
 emotion_classifier, sentiment_classifier = load_pipelines()
 
-# Extract headlines from url
-
-def extract_headline(url):
-    try:
-        response = requests.get(url)
-        soup = BeautifulSoup(response.text, "html.parser")
-        title = soup.find("title")
-        return title.text.strip() if title else None
-    except Exception as e:
-        return None
-
 
 def classify_headline(headline):
     emotion_scores = emotion_classifier(headline)[0]
@@ -42,20 +31,14 @@ def classify_headline(headline):
 
 st.title("Headline Emotion & Sentiment Analyzer")
 
-url = st.text_input("Paste the URL of a news article:")
+st.markdown("Enter a news **headline** below and get instant emotion + sentiment analysis")
 
-if url:
-    st.write("Fetching headline...")
-    headline = extract_headline(url)
+headline_input = st.text_input("Enter headline:")
 
-    if headline:
-        st.success(f"Extracted Headline: *{headline}*")
-        with st.spinner("Classifying..."):
-            result = classify_headline(headline)
+if headline_input:
+    with st.spinner("Analyzing headline..."):
+        result = classify_headline(headline_input)
 
-        st.markdown("### 🎯 Classification Result")
-        st.write(f"**Emotion:** {result['emotion']} ({result['emotion_score']})")
-        st.write(f"**Sentiment:** {result['sentiment']} ({result['sentiment_score']})")
-
-    else:
-        st.error("Could not extract a headline from the page.")
+    st.markdown("### Classification Result")
+    st.write(f"**Emotion:** {result['emotion']} ({result['emotion_score']})")
+    st.write(f"**Sentiment:** {result['sentiment']} ({result['sentiment_score']})")
